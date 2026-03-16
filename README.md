@@ -21,4 +21,4 @@ https://www.auckland.ac.nz
 
 A meme that captures how I currently feel about my university studies is:
 
-![](https://media.tenor.com/8druEACXtX8AAAAd/pog-meme.gif)
+![]([https://media.tenor.com/8druEACXtX8AAAAd/pog-meme.gif](https://tenor.com/en-GB/view/pog-meme-twitch-laugh-funny-gif-22288056))
