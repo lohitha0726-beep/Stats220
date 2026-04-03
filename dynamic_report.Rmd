@@ -1,0 +1,125 @@
+---
+title: My dynamic report
+output: html_fragment
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, message=FALSE, warning=FALSE, error=FALSE)
+library(tidyverse)
+```
+
+## Drink Purchase Analysis
+
+This report explores data collected from a Google Form about drinks that people purchased. It analyses drink types, drink prices, and where drinks were purchased from, using **dynamic summaries** and **bar charts** that update automatically when new data is added.
+
+```{r load-data}
+logged_data <- read_csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vRSFddzOLQ0P_l61-lFGnwQQbvRCShib-AZEmYme5754XTlyQ_wp1jCsJk8jgsHeHg8jP6e1nbB5F3y/pub?gid=778220564&single=true&output=csv") %>%
+  rename(
+    timestamp  = 1,
+    drink_type = 2,
+    cost_nzd   = 3,
+    shop       = 4
+  )
+```
+
+```{r summaries}
+total_drinks <- logged_data$drink_type %>%
+  length()
+
+mean_price <- logged_data$cost_nzd %>%
+  mean(na.rm = TRUE) %>%
+  round(2)
+
+min_price <- logged_data$cost_nzd %>%
+  min(na.rm = TRUE) %>%
+  round(2)
+
+max_price <- logged_data$cost_nzd %>%
+  max(na.rm = TRUE) %>%
+  round(2)
+```
+
+
+::: dynamic-comment
+A total of `r total_drinks` drink purchases have been recorded in this dataset. The average price paid was **$`r mean_price` NZD**, with the cheapest drink costing **$`r min_price`** and the most expensive costing **$`r max_price`**.
+:::
+
+---
+
+```{r fig.width=8, fig.height=4}
+logged_data %>%
+  ggplot() +
+  geom_bar(aes(x = drink_type, fill = drink_type)) +
+  labs(
+    title   = "Number of Drinks by Type",
+    x       = "Drink Type",
+    y       = "Count",
+    caption = "Source: Drink Purchase Google Form"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+---
+
+```{r price-groups}
+price_groups <- logged_data %>%
+  mutate(
+    price_range = case_when(
+      cost_nzd < 5                   ~ "Under $5",
+      cost_nzd >= 5 & cost_nzd < 10  ~ "$5 to $9.99",
+      cost_nzd >= 10                  ~ "$10 and over"
+    )
+  )
+```
+
+```{r fig.width=8, fig.height=4}
+price_groups %>%
+  ggplot() +
+  geom_bar(aes(x = price_range, fill = price_range)) +
+  labs(
+    title   = "Number of Drinks by Price Range",
+    x       = "Price Range",
+    y       = "Count",
+    caption = "Source: Drink Purchase Google Form"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+---
+
+```{r fig.width=8, fig.height=5}
+logged_data %>%
+  ggplot() +
+  geom_bar(aes(y = shop, fill = shop)) +
+  labs(
+    title   = "Number of Drinks Purchased by Shop",
+    x       = "Count",
+    y       = "Shop",
+    caption = "Source: Drink Purchase Google Form"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+---
+
+::: dynamic-comment
+The `r total_drinks` drink purchases recorded show an average spend of $`r mean_price` NZD per drink. Prices range from $`r min_price` to $`r max_price`. The charts above show the breakdown of purchases by drink type, price range, and shop location.
+:::
+
+```{css, echo=FALSE}
+body {
+  font-family: Arial, sans-serif;
+}
+h2 {
+  color: #2E86C1;
+}
+h3 {
+  color: #117A65;
+}
+p {
+  font-size: 16px;
+}
+```
